@@ -1,206 +1,239 @@
 ﻿using System.Linq;
 using System.Diagnostics;
 using System.Collections.Generic;
-using NUnit.Framework;
-using UnityEngine;
 using Unity.Collections;
+using UnityEngine;
+using NUnit.Framework;
 
 
 namespace Amarcolina.NativeHeap.Tests
 {
-    public class NativeHeapTests {
+    public class NativeHeapTests
+    {
+        private NativeHeap<int, Min> _heap;
 
-        private NativeHeap<int, Min> Heap;
 
         [SetUp]
-        public void SetUp() {
-            Heap = new NativeHeap<int, Min>(Allocator.Persistent);
+        public void SetUp()
+        {
+            _heap = new NativeHeap<int, Min>(Allocator.Persistent);
         }
 
         [TearDown]
-        public void TearDown() {
-            Heap.Dispose();
+        public void TearDown()
+        {
+            _heap.Dispose();
         }
 
         [Test]
-        public void TestInsertionAndRemoval() {
+        public void TestInsertionAndRemoval()
+        {
             List<int> list = new List<int>();
-            for (int i = 0; i < 100; i++) {
-                Heap.Insert(i);
+            for (int i = 0; i < 100; i++)
+            {
+                _heap.Insert(i);
                 list.Add(i);
             }
 
-            for (int i = 0; i < 1000; i++) {
-                var min = Heap.Pop();
+            for (int i = 0; i < 1000; i++)
+            {
+                var min = _heap.Pop();
                 Assert.That(min, Is.EqualTo(list.Min()));
 
                 list.Remove(min);
 
                 int toInsert = Random.Range(0, 100);
-                Heap.Insert(toInsert);
+                _heap.Insert(toInsert);
                 list.Add(toInsert);
             }
         }
 
         [Test]
-        public void TestCanRemoveUsingIndex() {
+        public void TestCanRemoveUsingIndex()
+        {
             List<(int, NativeHeapIndex)> itemRefs = new List<(int, NativeHeapIndex)>();
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 100; i++)
+            {
                 int value = Random.Range(0, 1000);
-                var itemRef = Heap.Insert(value);
+                var itemRef = _heap.Insert(value);
                 itemRefs.Add((value, itemRef));
             }
 
-            foreach ((var value, var itemRef) in itemRefs) {
-                var item = Heap.Remove(itemRef);
+            foreach ((var value, var itemRef) in itemRefs)
+            {
+                var item = _heap.Remove(itemRef);
                 Assert.That(item, Is.EqualTo(value));
             }
         }
 
         [Test]
-        public void TestRemovingTwiceThrowsException() {
+        public void TestRemovingTwiceThrowsException()
+        {
             InconclusiveIfNoSafety();
 
-            for (int i = 0; i < 10; i++) Heap.Insert(i);
+            for (int i = 0; i < 10; i++)
+                _heap.Insert(i);
 
-            var itemRef = Heap.Insert(5);
+            var itemRef = _heap.Insert(5);
 
-            for (int i = 0; i < 10; i++) Heap.Insert(i);
+            for (int i = 0; i < 10; i++)
+                _heap.Insert(i);
 
-            Heap.Remove(itemRef);
+            _heap.Remove(itemRef);
 
-            Assert.That(() => { Heap.Remove(itemRef); }, Throws.ArgumentException);
+            Assert.That(() => { _heap.Remove(itemRef); }, Throws.ArgumentException);
         }
 
         [Test]
-        public void TestIndicesBecomeInvalidAfterPopping() {
-            InconclusiveIfNoSafety();
-
-            List<NativeHeapIndex> indices = new List<NativeHeapIndex>();
-            for (int i = 0; i < 10; i++) {
-                indices.Add(Heap.Insert(Random.Range(0, 100)));
-            }
-
-            for (int i = 0; i < 10; i++) {
-                Heap.Pop();
-            }
-
-            foreach (var index in indices) {
-                Assert.That(Heap.IsValidIndex(index), Is.False);
-            }
-        }
-
-        [Test]
-        public void TestIndicesBecomeInvalidAfterClearing() {
+        public void TestIndicesBecomeInvalidAfterPopping()
+        {
             InconclusiveIfNoSafety();
 
             List<NativeHeapIndex> indices = new List<NativeHeapIndex>();
-            for (int i = 0; i < 100; i++) {
-                indices.Add(Heap.Insert(i));
+            for (int i = 0; i < 10; i++)
+            {
+                indices.Add(_heap.Insert(Random.Range(0, 100)));
             }
 
-            Heap.Clear();
+            for (int i = 0; i < 10; i++)
+            {
+                _heap.Pop();
+            }
 
-            foreach (var index in indices) {
-                Assert.That(Heap.IsValidIndex(index), Is.False);
+            foreach (var index in indices)
+            {
+                Assert.That(_heap.IsValidIndex(index), Is.False);
             }
         }
 
         [Test]
-        public void TestIndicesAreStillValidAfterRealloc() {
+        public void TestIndicesBecomeInvalidAfterClearing()
+        {
             InconclusiveIfNoSafety();
 
             List<NativeHeapIndex> indices = new List<NativeHeapIndex>();
-            for (int i = 0; i < 100; i++) {
-                indices.Add(Heap.Insert(i));
+            for (int i = 0; i < 100; i++)
+            {
+                indices.Add(_heap.Insert(i));
             }
 
-            Heap.Capacity *= 2;
+            _heap.Clear();
 
-            for (int i = 0; i < 100; i++) {
-                Assert.That(Heap.Peek(), Is.EqualTo(i));
-                Heap.Remove(indices[i]);
+            foreach (var index in indices)
+            {
+                Assert.That(_heap.IsValidIndex(index), Is.False);
             }
-            Assert.That(Heap.Count, Is.Zero);
         }
 
         [Test]
-        public void TestIndicesFromOneHeapAreInvalidForAnother() {
+        public void TestIndicesAreStillValidAfterRealloc()
+        {
             InconclusiveIfNoSafety();
 
-            using (var Heap2 = new NativeHeap<int, Min>(Allocator.Temp)) {
-                var index = Heap.Insert(0);
-                Heap2.Insert(0);
-
-                Assert.That(Heap2.IsValidIndex(index), Is.False);
-                Assert.That(() => { Heap2.Remove(index); }, Throws.ArgumentException);
+            List<NativeHeapIndex> indices = new List<NativeHeapIndex>();
+            for (int i = 0; i < 100; i++)
+            {
+                indices.Add(_heap.Insert(i));
             }
+
+            _heap.Capacity *= 2;
+
+            for (int i = 0; i < 100; i++)
+            {
+                Assert.That(_heap.Peek(), Is.EqualTo(i));
+                _heap.Remove(indices[i]);
+            }
+            Assert.That(_heap.Count, Is.Zero);
         }
 
         [Test]
-        public void TestPeekIsSameAsPop() {
-            for (int i = 0; i < 100; i++) {
-                Heap.Insert(Random.Range(0, 1000));
+        public void TestIndicesFromOneHeapAreInvalidForAnother()
+        {
+            InconclusiveIfNoSafety();
+
+            using NativeHeap<int, Min> heap2 = new NativeHeap<int, Min>(Allocator.Temp);
+            NativeHeapIndex index = _heap.Insert(0);
+            heap2.Insert(0);
+
+            Assert.That(heap2.IsValidIndex(index), Is.False);
+            Assert.That(() => { heap2.Remove(index); }, Throws.ArgumentException);
+        }
+
+        [Test]
+        public void TestPeekIsSameAsPop()
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                _heap.Insert(Random.Range(0, 1000));
             }
 
-            while (Heap.Count > 0) {
-                int value1 = Heap.Peek();
-                int value2 = Heap.Pop();
+            while (_heap.Count > 0)
+            {
+                int value1 = _heap.Peek();
+                int value2 = _heap.Pop();
 
                 Assert.That(value1, Is.EqualTo(value2));
             }
         }
 
         [Test]
-        public void TestRemoveFromMiddle() {
+        public void TestRemoveFromMiddle()
+        {
             List<int> items = new List<int>();
             int GetValue() => Random.value > 0.5f ? Random.Range(0, 1000) : Random.Range(1001, 2000);
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 100; i++)
+            {
                 var value = GetValue();
                 items.Add(value);
-                Heap.Insert(value);
+                _heap.Insert(value);
             }
 
-            var index = Heap.Insert(1000);
+            var index = _heap.Insert(1000);
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 100; i++)
+            {
                 var value = GetValue();
                 items.Add(value);
-                Heap.Insert(value);
+                _heap.Insert(value);
             }
 
-            Heap.Remove(index);
+            _heap.Remove(index);
 
-            foreach (var item in items.OrderBy(i => i)) {
-                Assert.That(Heap.Pop(), Is.EqualTo(item));
+            foreach (var item in items.OrderBy(i => i))
+            {
+                Assert.That(_heap.Pop(), Is.EqualTo(item));
             }
         }
 
         [Test]
-        public void TestCopyReflectsChanges() {
-            var heapCopy = Heap;
+        public void TestCopyReflectsChanges()
+        {
+            var heapCopy = _heap;
             heapCopy.Insert(5);
             heapCopy.Capacity *= 2;
 
-            Assert.That(Heap.Peek(), Is.EqualTo(5));
+            Assert.That(_heap.Peek(), Is.EqualTo(5));
 
             heapCopy.Pop();
 
-            Assert.That(Heap.Count, Is.Zero);
-            Assert.That(Heap.Capacity, Is.EqualTo(heapCopy.Capacity));
+            Assert.That(_heap.Count, Is.Zero);
+            Assert.That(_heap.Capacity, Is.EqualTo(heapCopy.Capacity));
         }
 
-        private void InconclusiveIfNoSafety() {
+        private void InconclusiveIfNoSafety()
+        {
             bool isOn = false;
             CheckSafetyChecks(ref isOn);
-            if (!isOn) {
+            if (!isOn)
+            {
                 Assert.Inconclusive("This test requires safety checks");
             }
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
-        private void CheckSafetyChecks(ref bool isOn) {
+        private void CheckSafetyChecks(ref bool isOn)
+        {
             isOn = true;
         }
     }
