@@ -5,6 +5,12 @@ The heap is generic, allowing you to store arbitrary unmanaged types in the coll
 
 This implementation allows you to remove items from the center of the collection with the same cost as removing them in-order. When an item is added, a special `Index` is returned that can later be used to remove the item.
 
+### Installation
+
+To drop NativeHeap into your existing project, clone the `package` branch. This branch only contains the minimal files needed for the heap implementation.
+
+To obtain the full Unity project in which NativeHeap is developed, clone the `project` branch.
+
 ### Example Usage
 Basic example
 ```csharp
