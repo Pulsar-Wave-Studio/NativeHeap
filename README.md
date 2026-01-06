@@ -1,13 +1,10 @@
 # Native Heap
 
-This repo contains a heap implementation for use with the Unity Burst compiler.
+This repo contains a heap implementation compatible with the Unity Burst compiler.
+
+The heap is generic, allowing you to store arbitrary unmanaged types in the collection. Along with the type of the stored elements, you must also provide a type implementing the IComparer<T> interface for the type you store in the heap. The project contains a Min and Max comparator implementation for built-in numeric types. You can provide a comparator for your custom type by implementing the IComparer<T> interface.
 
 This implementation allows you to remove items from the center of the collection with the same cost as removing them in-order. When an item is added, a special `Index` is returned that can later be used to remove the item.
-
-### Parameterization
-The NativeHeap is generic like NativeArray<T> or NativeList<T>, allowing you to store structs of type T ín the collection. The second parameter is the `Comparator` and is responsible for determining the ordering of the items inside the heap.
-
-Two comparators are included, the Min and Max comparator, which are able to construct a MinHeap or a MaxHeap for the built-in csharp primitives such as `int` and `float`. Writing your own comparator is as simple as implementing the IComparer<T> interface for the type you would like to insert.
 
 ### Example Usage
 Basic example
