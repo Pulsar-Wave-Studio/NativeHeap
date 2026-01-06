@@ -3,11 +3,11 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
-using UnityEngine.TestTools;
 using NUnit.Framework;
 
-namespace Tests {
 
+namespace Amarcolina.NativeHeap.Tests
+{
     public class NativeHeapTests {
 
         private NativeHeap<int, Min> Heap;

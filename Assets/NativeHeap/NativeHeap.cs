@@ -3,12 +3,11 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 
-namespace Unity.Collections {
-    using LowLevel.Unsafe;
-
-    using static Unity.Collections.LowLevel.Unsafe.UnsafeUtility;
-
+namespace Amarcolina.NativeHeap
+{
     public struct NativeHeapIndex {
         internal int TableIndex;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
@@ -70,12 +69,12 @@ namespace Unity.Collections {
                         throw new ArgumentException($"Capacity of {value} cannot be smaller than count of {Data->Count}.");
                     }
 #endif
-                    TableValue* newTable = (TableValue*)Malloc(SizeOf<TableValue>() * value, AlignOf<TableValue>(), Allocator);
-                    HeapNode<T>* newHeap = (HeapNode<T>*)Malloc(SizeOf<HeapNode<T>>() * value, AlignOf<HeapNode<T>>(), Allocator);
+                    TableValue* newTable = (TableValue*)UnsafeUtility.Malloc(UnsafeUtility.SizeOf<TableValue>() * value, UnsafeUtility.AlignOf<TableValue>(), Allocator);
+                    HeapNode<T>* newHeap = (HeapNode<T>*)UnsafeUtility.Malloc(UnsafeUtility.SizeOf<HeapNode<T>>() * value, UnsafeUtility.AlignOf<HeapNode<T>>(), Allocator);
 
                     int toCopy = Data->Capacity < value ? Data->Capacity : value;
-                    MemCpy(newTable, Data->Table, toCopy * SizeOf<TableValue>());
-                    MemCpy(newHeap, Data->Heap, toCopy * SizeOf<HeapNode<T>>());
+                    UnsafeUtility.MemCpy(newTable, Data->Table, toCopy * UnsafeUtility.SizeOf<TableValue>());
+                    UnsafeUtility.MemCpy(newHeap, Data->Heap, toCopy * UnsafeUtility.SizeOf<HeapNode<T>>());
 
                     for (int i = 0; i < value - Data->Capacity; i++) {
                         //For each new heap node, make sure that it has a new unique index
@@ -91,8 +90,8 @@ namespace Unity.Collections {
 #endif
                     }
 
-                    Free(Data->Table, Allocator);
-                    Free(Data->Heap, Allocator);
+                    UnsafeUtility.Free(Data->Table, Allocator);
+                    UnsafeUtility.Free(Data->Heap, Allocator);
 
                     Data->Table = newTable;
                     Data->Heap = newHeap;
@@ -175,9 +174,9 @@ namespace Unity.Collections {
                 Data->Count = 0;
                 Data->Capacity = 0;
 
-                Free(Data->Heap, Allocator);
-                Free(Data->Table, Allocator);
-                Free(Data, Allocator);
+                UnsafeUtility.Free(Data->Heap, Allocator);
+                UnsafeUtility.Free(Data->Table, Allocator);
+                UnsafeUtility.Free(Data, Allocator);
             }
         }
 
@@ -411,7 +410,7 @@ namespace Unity.Collections {
                 HeapNode<T> lastNode = Data->Heap[--Data->Count];
 
                 //First we move the node to remove to the end of the heap
-                WriteArrayElement(Data->Heap, Data->Count, toRemove);
+                UnsafeUtility.WriteArrayElement(Data->Heap, Data->Count, toRemove);
 
                 if (indexToRemove != 0) {
                     int parentIndex = (indexToRemove - 1) / 2;
@@ -467,9 +466,9 @@ namespace Unity.Collections {
             Id = Interlocked.Increment(ref NextId);
 #endif
 
-            Data = (HeapData<T, U>*)Malloc(SizeOf<HeapData<T, U>>(), AlignOf<HeapData<T, U>>(), allocator);
-            Data->Heap = (HeapNode<T>*)Malloc(SizeOf<HeapNode<T>>() * initialCapacity, AlignOf<HeapNode<T>>(), allocator);
-            Data->Table = (TableValue*)Malloc(SizeOf<TableValue>() * initialCapacity, AlignOf<TableValue>(), allocator);
+            Data = (HeapData<T, U>*)UnsafeUtility.Malloc(UnsafeUtility.SizeOf<HeapData<T, U>>(), UnsafeUtility.AlignOf<HeapData<T, U>>(), allocator);
+            Data->Heap = (HeapNode<T>*)UnsafeUtility.Malloc(UnsafeUtility.SizeOf<HeapNode<T>>() * initialCapacity, UnsafeUtility.AlignOf<HeapNode<T>>(), allocator);
+            Data->Table = (TableValue*)UnsafeUtility.Malloc(UnsafeUtility.SizeOf<TableValue>() * initialCapacity, UnsafeUtility.AlignOf<TableValue>(), allocator);
 
             Allocator = allocator;
 

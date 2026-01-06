@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Unity.Collections {
 
+namespace Amarcolina.NativeHeap
+{
     public struct Max : IComparer<byte>,
                         IComparer<ushort>,
                         IComparer<short>,
@@ -11,45 +12,55 @@ namespace Unity.Collections {
                         IComparer<long>,
                         IComparer<float>,
                         IComparer<double>,
-                        IComparer<decimal> {
-
-        public int Compare(byte x, byte y) {
+                        IComparer<decimal>
+    {
+        public int Compare(byte x, byte y)
+        {
             return y.CompareTo(x);
         }
 
-        public int Compare(ushort x, ushort y) {
+        public int Compare(ushort x, ushort y)
+        {
             return y.CompareTo(x);
         }
 
-        public int Compare(short x, short y) {
+        public int Compare(short x, short y)
+        {
             return y.CompareTo(x);
         }
 
-        public int Compare(uint x, uint y) {
+        public int Compare(uint x, uint y)
+        {
             return y.CompareTo(x);
         }
 
-        public int Compare(int x, int y) {
+        public int Compare(int x, int y)
+        {
             return y.CompareTo(x);
         }
 
-        public int Compare(ulong x, ulong y) {
+        public int Compare(ulong x, ulong y)
+        {
             return y.CompareTo(x);
         }
 
-        public int Compare(long x, long y) {
+        public int Compare(long x, long y)
+        {
             return y.CompareTo(x);
         }
 
-        public int Compare(float x, float y) {
+        public int Compare(float x, float y)
+        {
             return y.CompareTo(x);
         }
 
-        public int Compare(double x, double y) {
+        public int Compare(double x, double y)
+        {
             return y.CompareTo(x);
         }
 
-        public int Compare(decimal x, decimal y) {
+        public int Compare(decimal x, decimal y)
+        {
             return y.CompareTo(x);
         }
     }
