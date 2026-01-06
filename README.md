@@ -1,5 +1,4 @@
 # Native Heap
-
 This repo contains a heap implementation compatible with the Unity Burst compiler.
 
 The heap is generic, allowing you to store arbitrary unmanaged types in the collection. Along with the type of the stored elements, you must also provide a type implementing the IComparer<T> interface for the type you store in the heap. The project contains a Min and Max comparator implementation for built-in numeric types. You can provide a comparator for your custom type by implementing the IComparer<T> interface.
@@ -63,7 +62,9 @@ print(heap.Pop()); //10
 heap.Dispose();
 ```
 
-### License
+### Unity Version
+This project is tested on Unity 6 and Unity 6.3. It likely works on earlier versions, but no promises.
 
+### License
 This project is based on work by [Alex Marcolina (MIT License)](https://github.com/Amarcolina/NativeHeap).
 Modifications and additional code © 2026 [Pulsar Wave Studio](https://github.com/Pulsar-Wave-Studio/NativeHeap), also licensed under the [MIT License](https://github.com/Pulsar-Wave-Studio/NativeHeap/blob/master/LICENSE).
