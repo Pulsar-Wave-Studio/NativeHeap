@@ -1,5 +1,5 @@
 ﻿<Solution>
-  <Project Path="collections.nativeheap.csproj" />
-  <Project Path="NativeTests.csproj" />
+  <Project Path="Amarcolina.NativeHeap.csproj" />
+  <Project Path="Amarcolina.NativeHeap.Tests.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
 </Solution>

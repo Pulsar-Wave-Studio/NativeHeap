@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Diagnostics;
 using System.Collections.Generic;
-using Unity.Collections;
-using UnityEngine;
 using NUnit.Framework;
+using UnityEngine;
+using Unity.Collections;
 
 
 namespace Amarcolina.NativeHeap.Tests

@@ -1,6 +1,10 @@
 {
-    "name": "collections.nativeheap",
-    "references": [],
+    "name": "Amarcolina.NativeHeap",
+    "rootNamespace": "Amarcolina.NativeHeap",
+    "references": [
+        "Unity.Burst",
+        "Unity.Collections"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
