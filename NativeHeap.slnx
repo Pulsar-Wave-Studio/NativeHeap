@@ -1,0 +1,4 @@
+﻿<Solution>
+  <Project Path="collections.nativeheap.csproj" />
+  <Project Path="NativeTests.csproj" />
+</Solution>
