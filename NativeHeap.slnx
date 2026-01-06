@@ -1,4 +1,5 @@
 ﻿<Solution>
   <Project Path="collections.nativeheap.csproj" />
   <Project Path="NativeTests.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
 </Solution>
